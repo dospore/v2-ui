@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import store from 'mobx/RootStore';
 import { StoreProvider } from '../../mobx/store-context';
-import { customRender, screen, fireEvent, cleanup, act } from '../Utils';
+import { customRender, screen, fireEvent } from '../Utils';
 import { Mint } from '../../components/IbBTC/Mint';
 import { Snackbar } from '../../components/Snackbar';
 import Header from '../../components/Header';
@@ -38,8 +38,6 @@ const mockTokens = [
 
 describe('ibBTC Mint', () => {
 	beforeEach(() => {
-		jest.useFakeTimers();
-
 		store.onboard.address = '0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a';
 
 		jest.spyOn(IbBTCStore.prototype, 'ibBTC', 'get').mockReturnValue(SAMPLE_IBBTC_TOKEN_BALANCE);
@@ -61,14 +59,15 @@ describe('ibBTC Mint', () => {
 			'0x55912D0Cf83B75c492E761932ABc4DB4a5CB1b17': '0.999502',
 		};
 
-		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-		jest.spyOn(IbBTCStore.prototype, 'calcMintAmount').mockImplementation(async (_balance) => ({
+		jest.spyOn(IbBTCStore.prototype, 'calcMintAmount').mockImplementation(async () => ({
 			bBTC: TokenBalance.fromBalance(SAMPLE_IBBTC_TOKEN_BALANCE, '11.988').tokenBalance,
 			fee: TokenBalance.fromBalance(SAMPLE_IBBTC_TOKEN_BALANCE, '0.0120').tokenBalance,
 		}));
 	});
 
-	afterEach(cleanup);
+	afterEach(() => {
+		jest.useRealTimers();
+	});
 
 	it('displays token input balance and ibBTC balance', () => {
 		customRender(
@@ -106,6 +105,8 @@ describe('ibBTC Mint', () => {
 	});
 
 	it('can change token', async () => {
+		jest.useFakeTimers();
+
 		const { container } = customRender(
 			<StoreProvider value={store}>
 				<Mint />
@@ -141,8 +142,6 @@ describe('ibBTC Mint', () => {
 	});
 
 	it('handles empty balance', async () => {
-		jest.useRealTimers();
-
 		customRender(
 			<StoreProvider value={store}>
 				<Snackbar>
@@ -162,6 +161,8 @@ describe('ibBTC Mint', () => {
 	});
 
 	it('executes calcMint with correct params', async () => {
+		jest.useFakeTimers();
+
 		const calcMintSpy = jest.spyOn(IbBTCStore.prototype, 'calcMintAmount');
 
 		customRender(
@@ -183,6 +184,8 @@ describe('ibBTC Mint', () => {
 	});
 
 	it('executes mint with correct params', async () => {
+		jest.useFakeTimers();
+
 		const mintSpy = jest
 			.spyOn(IbBTCStore.prototype, 'mint')
 			.mockReturnValue(Promise.resolve(TransactionRequestResult.Success));

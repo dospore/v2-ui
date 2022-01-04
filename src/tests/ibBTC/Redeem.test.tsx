@@ -80,8 +80,6 @@ describe('ibBTC Redeem', () => {
 
 	describe('Input Change', () => {
 		beforeEach(() => {
-			jest.useFakeTimers();
-
 			store.onboard.address = '0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a';
 			store.ibBTCStore.calcRedeemAmount = jest.fn().mockReturnValue({
 				fee: TokenBalance.fromBalance(store.ibBTCStore.ibBTC, '0.0120').tokenBalance,
@@ -90,7 +88,13 @@ describe('ibBTC Redeem', () => {
 			});
 		});
 
+		afterEach(() => {
+			jest.useRealTimers();
+		});
+
 		it('displays output balance when redeem amount is inputted', async () => {
+			jest.useFakeTimers();
+
 			const { container } = customRender(
 				<StoreProvider value={store}>
 					<Redeem />
@@ -107,8 +111,6 @@ describe('ibBTC Redeem', () => {
 		});
 
 		it('handles exceeding ibBTC redeem input amount', async () => {
-			jest.useRealTimers();
-
 			customRender(
 				<StoreProvider value={store}>
 					<Snackbar>
@@ -128,6 +130,8 @@ describe('ibBTC Redeem', () => {
 		});
 
 		it('executes redeem with correct params', async () => {
+			jest.useFakeTimers();
+
 			const redeemMock = jest.fn().mockReturnValue(Promise.resolve(TransactionRequestResult.Success));
 
 			store.ibBTCStore.redeem = redeemMock;
@@ -156,6 +160,8 @@ describe('ibBTC Redeem', () => {
 		});
 
 		it('executes calcRedeem and getRedeemConversionRate with correct params', async () => {
+			jest.useFakeTimers();
+
 			const calcRedeemSpy = jest.fn().mockReturnValue({
 				fee: TokenBalance.fromBalance(store.ibBTCStore.ibBTC, '0.0120').tokenBalance,
 				max: TokenBalance.fromBalance(store.ibBTCStore.ibBTC, '100').tokenBalance,
