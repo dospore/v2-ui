@@ -665,7 +665,7 @@ const checkUserAddrInvariantAndThrow = (tx: RenVMTransaction) => {
 
 	const user = tx.params.contractParams?.find(({ name }) => name === '_user');
 	if (user?.value.toLowerCase() !== tx.user) {
-		throw `Mint destination (${user?.value}) does not match connected address (${tx.user})`;
+		throw new Error(`Mint destination (${user?.value}) does not match connected address (${tx.user})`);
 	}
 };
 
