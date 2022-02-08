@@ -109,7 +109,7 @@ const Header = observer(() => {
 			enqueueSnackbar(notification.message, { variant: notification.variant, persist: false });
 		}
 	};
-	useEffect(enq, [notification]);
+	useEffect(enq, [notification, enqueueSnackbar, network, notify]);
 
 	return (
 		<div className={classes.root}>
